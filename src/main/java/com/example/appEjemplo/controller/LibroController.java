@@ -29,57 +29,57 @@ public class LibroController {
     @GetMapping("/libro/vertodos")
     public ResponseEntity<List<Libro>> list() {
         List<Libro> list = libroserv.list();
-        return new ResponseEntity(list, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     @GetMapping("/libro/ver/{id}")
     public ResponseEntity<Libro> getById(@PathVariable("id") int id) {
         if (!libroserv.existsById(id)) {
-            return new ResponseEntity("el libro indicado no existe", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         Libro libro = libroserv.getById(id).get();
-        return new ResponseEntity(libro, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(libro);
     }
 
     @DeleteMapping("/libro/borrar/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") int id) {
         if (!libroserv.existsById(id)) {
-            return new ResponseEntity("el libro que se desea eliminar no existe", HttpStatus.NOT_FOUND);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         libroserv.delete(id);
-        return new ResponseEntity("se eliminó correctamente", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PostMapping("/libro/crear")
     public ResponseEntity<?> create(@RequestBody LibroDTO dtolibro) {
         if (StringUtils.isBlank(dtolibro.getNombre())) {
-            return new ResponseEntity("El nombre del libro es obligatorio", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         
         if (libroserv.existsByNombre(dtolibro.getNombre())) {
-            return new ResponseEntity("Es libro que desea agregar ya existe", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         Libro libro = new Libro(dtolibro.getNombre(), dtolibro.getAutor(), dtolibro.getEditorial(), 
                                 dtolibro.getAnio(), dtolibro.isFueLeido(), dtolibro.getFormato());
         libroserv.save(libro);
 
-        return new ResponseEntity("Libro agregado", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PutMapping("/producto/editar/{id}")
+    @PutMapping("/libro/editar/{id}")
     public ResponseEntity<?> update(@PathVariable("id") int id, @RequestBody LibroDTO dtolibro) {
 
         if (!libroserv.existsById(id)) {
-            return new ResponseEntity("El ID no existe", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         if (libroserv.existsByNombre(dtolibro.getNombre()) && libroserv.getByNombre(dtolibro.getNombre()).get().getId() != id) {
-            return new ResponseEntity("El libro ya existe", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         if (StringUtils.isBlank(dtolibro.getNombre())) {
-            return new ResponseEntity("El nombre del libro es obligatorio", HttpStatus.BAD_REQUEST);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
         Libro libro = libroserv.getById(id).get();
@@ -91,7 +91,7 @@ public class LibroController {
         libro.setFormato(dtolibro.getFormato());
 
         libroserv.save(libro);
-        return new ResponseEntity("Libro actualizado", HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
 
     }
 
